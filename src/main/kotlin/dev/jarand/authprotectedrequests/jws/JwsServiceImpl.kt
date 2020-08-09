@@ -1,7 +1,5 @@
 package dev.jarand.authprotectedrequests.jws
 
-import dev.jarand.authapi.jws.domain.ParseClaimsResult
-import dev.jarand.authapi.jws.domain.ParseClaimsResultState
 import dev.jarand.authprotectedrequests.publickey.PublicKeyFetcher
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
@@ -14,9 +12,9 @@ import java.security.PublicKey
 
 @Service
 @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
-class JwsServiceImpl(val publicKeyFetcher: PublicKeyFetcher) : JwsService {
+class JwsServiceImpl(private val publicKeyFetcher: PublicKeyFetcher) : JwsService {
 
-    var publicKey: PublicKey? = null
+    private var publicKey: PublicKey? = null
 
     override fun parseClaims(encodedJws: String): ParseClaimsResult {
         if (publicKey == null) {

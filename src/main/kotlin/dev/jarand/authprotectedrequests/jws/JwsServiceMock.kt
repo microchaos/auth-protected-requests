@@ -1,7 +1,5 @@
 package dev.jarand.authprotectedrequests.jws
 
-import dev.jarand.authapi.jws.domain.ParseClaimsResult
-import dev.jarand.authapi.jws.domain.ParseClaimsResultState
 import io.jsonwebtoken.impl.DefaultClaims
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty

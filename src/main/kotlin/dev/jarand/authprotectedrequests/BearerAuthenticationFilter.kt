@@ -1,6 +1,6 @@
 package dev.jarand.authprotectedrequests
 
-import dev.jarand.authapi.jws.domain.ParseClaimsResultState
+import dev.jarand.authprotectedrequests.jws.ParseClaimsResultState
 import dev.jarand.authprotectedrequests.jws.JwsService
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
