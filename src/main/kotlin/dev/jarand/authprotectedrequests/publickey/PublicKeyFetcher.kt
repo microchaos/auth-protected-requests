@@ -11,11 +11,11 @@ import java.util.*
 
 @Service
 @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
-class PublicKeyFetcher(@Value("\${authentication.public-key-endpoint}") val publicKeyEndpoint: String,
+class PublicKeyFetcher(@Value("\${authentication.public-key.url}") val publicKeyUrl: String,
                        private val authApiRestTemplate: RestTemplate) {
 
     fun fetchPublicKey(): PublicKey {
-        val response = authApiRestTemplate.getForEntity(publicKeyEndpoint, KeyResource::class.java)
+        val response = authApiRestTemplate.getForEntity(publicKeyUrl, KeyResource::class.java)
         if (!response.statusCode.is2xxSuccessful) {
             throw IllegalStateException("Received invalid status ${response.statusCodeValue} from auth-api")
         }

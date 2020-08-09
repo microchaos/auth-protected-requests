@@ -16,7 +16,7 @@ GitHub Releases: [Link](https://github.com/microchaos/auth-protected-requests/re
 
 2. Configure URL of the exposed public key:
 ```
-auth-api.base-url=http://foo.bar/key/public
+authentication.public-key.url=http://foo.bar/key/public
 ```
 The key needs to be exposed in a JSON object like the following:
 ```json
