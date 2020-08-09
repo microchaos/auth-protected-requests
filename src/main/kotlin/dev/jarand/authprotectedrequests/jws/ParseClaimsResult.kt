@@ -1,4 +1,4 @@
-package dev.jarand.authapi.jws.domain
+package dev.jarand.authprotectedrequests.jws
 
 import io.jsonwebtoken.Claims
 

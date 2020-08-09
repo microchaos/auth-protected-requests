@@ -12,12 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
-
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig(val jwsServiceImpl: JwsService) : WebSecurityConfigurerAdapter() {
+open class WebSecurityConfig(private val jwsServiceImpl: JwsService) : WebSecurityConfigurerAdapter() {
 
-    final val annotation: EnableProtectedRequests
+    private val annotation: EnableProtectedRequests
 
     init {
         val provider = ClassPathScanningCandidateComponentProvider(false)

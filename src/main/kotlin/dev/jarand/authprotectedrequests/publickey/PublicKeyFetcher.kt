@@ -12,7 +12,7 @@ import java.util.*
 @Service
 @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
 class PublicKeyFetcher(@Value("\${authentication.public-key-endpoint}") val publicKeyEndpoint: String,
-                       val authApiRestTemplate: RestTemplate) {
+                       private val authApiRestTemplate: RestTemplate) {
 
     fun fetchPublicKey(): PublicKey {
         val response = authApiRestTemplate.getForEntity(publicKeyEndpoint, KeyResource::class.java)

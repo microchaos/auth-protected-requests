@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestTemplate
 
 @Configuration
-class PublicKeyFetcherConfig {
+open class PublicKeyFetcherConfig {
 
     @Bean
     @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
-    fun authApiRestTemplate(@Value("\${auth-api.base-url}") baseUrl: String): RestTemplate {
+    open fun authApiRestTemplate(@Value("\${auth-api.base-url}") baseUrl: String): RestTemplate {
         return RestTemplateBuilder().rootUri(baseUrl).build()
     }
 }
