@@ -14,9 +14,11 @@ Library for protecting applications and authorize users authenticated with Jaran
 Maven Central: [Link](https://search.maven.org/artifact/dev.jarand/auth-protected-requests)
 GitHub Releases: [Link](https://github.com/microchaos/auth-protected-requests/releases)
 
-2. Configure URL of the exposed public key:
+2. Configure URLs to the authentication api:
 ```
-authentication.public-key.url=http://foo.bar/key/public
+authentication.api.base-url=http://foo.bar/api
+authentication.api.endpoint.public-key=http://foo.bar/api/key/public
+authentication.api.endpoint.refresh-token=http://foo.bar/api/refresh-token
 ```
 The key needs to be exposed in a JSON object like the following:
 ```json

@@ -1,4 +1,4 @@
-package dev.jarand.authprotectedrequests.publickey
+package dev.jarand.authprotectedrequests.authapi
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -11,11 +11,12 @@ import java.util.*
 
 @Service
 @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
-class PublicKeyFetcher(@Value("\${authentication.public-key.url}") val publicKeyUrl: String,
-                       private val authApiRestTemplate: RestTemplate) {
+class AuthApiClient(@Value("\${authentication.api.endpoint.public-key}") val publicKeyEndpoint: String,
+                    @Value("\${authentication.api.endpoint.refresh-token}") val refreshTokenEndpoint: String,
+                    private val authApiRestTemplate: RestTemplate) {
 
     fun fetchPublicKey(): PublicKey {
-        val response = authApiRestTemplate.getForEntity(publicKeyUrl, KeyResource::class.java)
+        val response = authApiRestTemplate.getForEntity(publicKeyEndpoint, KeyResource::class.java)
         if (!response.statusCode.is2xxSuccessful) {
             throw IllegalStateException("Received invalid status ${response.statusCodeValue} from auth-api")
         }
@@ -26,5 +27,11 @@ class PublicKeyFetcher(@Value("\${authentication.public-key.url}") val publicKey
         val x509EncodedKeySpec = X509EncodedKeySpec(keyBytes)
         val keyFactory = KeyFactory.getInstance("RSA")
         return keyFactory.generatePublic(x509EncodedKeySpec)
+    }
+
+    fun refreshToken(refreshToken: String): String? {
+        val response = authApiRestTemplate.postForObject(refreshTokenEndpoint, RefreshTokenRequest(refreshToken), RefreshTokenResponse::class.java)
+                ?: return null
+        return response.accessToken
     }
 }
