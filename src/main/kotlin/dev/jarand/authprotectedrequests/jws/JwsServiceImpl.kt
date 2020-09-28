@@ -1,6 +1,6 @@
 package dev.jarand.authprotectedrequests.jws
 
-import dev.jarand.authprotectedrequests.authapi.AuthApiClient
+import dev.jarand.authprotectedrequests.authapi.AuthApiClientImpl
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
@@ -12,17 +12,17 @@ import java.security.PublicKey
 
 @Service
 @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
-class JwsServiceImpl(private val authApiClient: AuthApiClient) : JwsService {
+class JwsServiceImpl(private val authApiClientImpl: AuthApiClientImpl) : JwsService {
 
     private var publicKey: PublicKey? = null
 
     override fun parseClaims(encodedJws: String): ParseClaimsResult {
         if (publicKey == null) {
-            publicKey = authApiClient.fetchPublicKey()
+            publicKey = authApiClientImpl.fetchPublicKey()
         }
         val result = attemptParsing(encodedJws)
         if (result.state == ParseClaimsResultState.INVALID_SIGNATURE) {
-            publicKey = authApiClient.fetchPublicKey()
+            publicKey = authApiClientImpl.fetchPublicKey()
         }
         return attemptParsing(encodedJws)
     }

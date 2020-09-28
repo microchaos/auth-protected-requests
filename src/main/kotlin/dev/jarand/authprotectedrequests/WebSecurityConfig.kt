@@ -1,7 +1,7 @@
 package dev.jarand.authprotectedrequests
 
 import dev.jarand.authprotectedrequests.annotation.EnableProtectedRequests
-import dev.jarand.authprotectedrequests.authapi.AuthApiClient
+import dev.jarand.authprotectedrequests.authapi.AuthApiClientImpl
 import dev.jarand.authprotectedrequests.jws.JwsService
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.context.annotation.Configuration
@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 open class WebSecurityConfig(private val jwsServiceImpl: JwsService,
-                             private val authApiClient: AuthApiClient) : WebSecurityConfigurerAdapter() {
+                             private val authApiClientImpl: AuthApiClientImpl) : WebSecurityConfigurerAdapter() {
 
     private val annotation: EnableProtectedRequests
 
@@ -38,7 +38,7 @@ open class WebSecurityConfig(private val jwsServiceImpl: JwsService,
                 .anyRequest().authenticated().and().httpBasic().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .csrf().disable()
-                .addFilterBefore(BearerAuthenticationFilter(jwsServiceImpl, authApiClient), UsernamePasswordAuthenticationFilter::class.java)
+                .addFilterBefore(BearerAuthenticationFilter(jwsServiceImpl, authApiClientImpl), UsernamePasswordAuthenticationFilter::class.java)
 
     }
 
