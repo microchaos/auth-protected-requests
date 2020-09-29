@@ -13,9 +13,9 @@ import java.util.*
 @ConditionalOnProperty(name = ["authentication.mock.enabled"], havingValue = "false", matchIfMissing = true)
 class AuthApiClientImpl(@Value("\${authentication.api.endpoint.public-key}") val publicKeyEndpoint: String,
                         @Value("\${authentication.api.endpoint.refresh-token}") val refreshTokenEndpoint: String,
-                        private val authApiRestTemplate: RestTemplate) {
+                        private val authApiRestTemplate: RestTemplate) : AuthApiClient {
 
-    fun fetchPublicKey(): PublicKey {
+    override fun fetchPublicKey(): PublicKey {
         val response = authApiRestTemplate.getForEntity(publicKeyEndpoint, KeyResource::class.java)
         if (!response.statusCode.is2xxSuccessful) {
             throw IllegalStateException("Received invalid status ${response.statusCodeValue} from auth-api")
@@ -29,7 +29,7 @@ class AuthApiClientImpl(@Value("\${authentication.api.endpoint.public-key}") val
         return keyFactory.generatePublic(x509EncodedKeySpec)
     }
 
-    fun refreshToken(refreshToken: String): String? {
+    override fun refreshToken(refreshToken: String): String? {
         val response = authApiRestTemplate.postForObject(refreshTokenEndpoint, RefreshTokenRequest(refreshToken), RefreshTokenResponse::class.java)
                 ?: return null
         return response.accessToken
