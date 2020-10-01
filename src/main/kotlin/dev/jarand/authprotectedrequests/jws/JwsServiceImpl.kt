@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.SignatureException
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.security.PublicKey
@@ -18,10 +19,12 @@ class JwsServiceImpl(private val authApiClientImpl: AuthApiClientImpl) : JwsServ
 
     override fun parseClaims(encodedJws: String): ParseClaimsResult {
         if (publicKey == null) {
+            logger.debug("No public key. Fetching public key.")
             publicKey = authApiClientImpl.fetchPublicKey()
         }
         val result = attemptParsing(encodedJws)
         if (result.state == ParseClaimsResultState.INVALID_SIGNATURE) {
+            logger.debug("Invalid signature. Fetching public key again.")
             publicKey = authApiClientImpl.fetchPublicKey()
         }
         return attemptParsing(encodedJws)
@@ -41,5 +44,9 @@ class JwsServiceImpl(private val authApiClientImpl: AuthApiClientImpl) : JwsServ
                 else -> throw IllegalStateException("Unhandled exception", ex)
             }
         }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(JwsServiceImpl::class.java)
     }
 }

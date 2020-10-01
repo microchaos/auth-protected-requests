@@ -1,8 +1,10 @@
 package dev.jarand.authprotectedrequests.authapi
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -30,8 +32,21 @@ class AuthApiClientImpl(@Value("\${authentication.api.endpoint.public-key}") val
     }
 
     override fun refreshToken(refreshToken: String): String? {
-        val response = authApiRestTemplate.postForObject(refreshTokenEndpoint, RefreshTokenRequest(refreshToken), RefreshTokenResponse::class.java)
-                ?: return null
-        return response.accessToken
+        try {
+            logger.debug("Sending POST to refresh token")
+            val response = authApiRestTemplate.postForObject(refreshTokenEndpoint, RefreshTokenRequest(refreshToken), RefreshTokenResponse::class.java)
+            if (response == null) {
+                logger.debug("Response from auth-api was null. Returning null.")
+                return null
+            }
+            return response.accessToken
+        } catch (ex: HttpClientErrorException) {
+            logger.debug("Response from auth-api was ${ex.rawStatusCode}. Returning null.")
+            return null
+        }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(AuthApiClientImpl::class.java)
     }
 }

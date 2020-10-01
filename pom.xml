@@ -6,7 +6,7 @@
 
     <groupId>dev.jarand</groupId>
     <artifactId>auth-protected-requests</artifactId>
-    <version>0.4.5</version>
+    <version>0.4.6</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
