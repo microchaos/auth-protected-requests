@@ -6,12 +6,12 @@
 
     <groupId>dev.jarand</groupId>
     <artifactId>auth-protected-requests</artifactId>
-    <version>0.4.6</version>
+    <version>0.4.7</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.3.1.RELEASE</version>
+        <version>2.3.4.RELEASE</version>
         <relativePath/>
     </parent>
 
