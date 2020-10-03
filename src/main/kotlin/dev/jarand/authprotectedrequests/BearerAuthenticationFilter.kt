@@ -34,7 +34,7 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
 
         val tokenCookies = Arrays.stream(request.cookies)
                 .filter { it.name == "access_token" || it.name == "refresh_token" }
-                .collect(Collectors.toUnmodifiableList())
+                .collect(Collectors.toList())
         logger.debug("Found ${tokenCookies.size} token cookies.")
 
         for (tokenCookie in tokenCookies) {
