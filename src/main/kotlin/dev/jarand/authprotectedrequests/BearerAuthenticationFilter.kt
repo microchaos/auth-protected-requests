@@ -1,6 +1,7 @@
 package dev.jarand.authprotectedrequests
 
 import dev.jarand.authprotectedrequests.authapi.AuthApiClient
+import dev.jarand.authprotectedrequests.cookie.CookieService
 import dev.jarand.authprotectedrequests.jws.JwsService
 import dev.jarand.authprotectedrequests.jws.ParseClaimsResultState
 import io.jsonwebtoken.Claims
@@ -15,13 +16,13 @@ import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
-import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.streams.toList
 
-class BearerAuthenticationFilter(private val jwsService: JwsService, private val authApiClient: AuthApiClient) : Filter {
-
+class BearerAuthenticationFilter(private val jwsService: JwsService,
+                                 private val cookieService: CookieService,
+                                 private val authApiClient: AuthApiClient) : Filter {
     override fun doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, chain: FilterChain) {
         val request = servletRequest as HttpServletRequest
         val response = servletResponse as HttpServletResponse
@@ -64,7 +65,7 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
                     val result = jwsService.parseClaims(tokenCookie.value)
                     if (result.state == ParseClaimsResultState.SUCCESS && result.claims != null) {
                         logger.debug("Successfully parsed access_token after refreshing. Adding new access token to cookie.")
-                        response.addCookie(createCookie(accessToken, tokenCookie))
+                        response.addCookie(cookieService.createAccessTokenCookie(accessToken))
                         logger.debug("Successfully added access_token to cookie. Setting security context.")
                         setSecurityContext(result.claims)
                     } else if (result.state != ParseClaimsResultState.EXPIRED) {
@@ -87,16 +88,6 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
 
         val securityContext = SecurityContextHolder.getContext()
         securityContext.authentication = authentication
-    }
-
-    private fun createCookie(accessToken: String, refreshTokenCookie: Cookie): Cookie {
-        val cookie = Cookie("access_token", accessToken)
-        cookie.isHttpOnly = true
-        cookie.secure = true
-        cookie.domain = "arkivet.app"
-        cookie.path = "/"
-        cookie.maxAge = 120
-        return cookie
     }
 
     companion object {

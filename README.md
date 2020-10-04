@@ -26,8 +26,16 @@ The key needs to be exposed in a JSON object like the following:
   "key": "Base 64 encoded public key"
 }
 ```
-
-3. Add annotation with endpoints that should be protected and open:
+3. Configure the access token cookie
+```
+authentication.cookie.name=access_token
+authentication.cookie.http-only=true
+authentication.cookie.secure=true
+authentication.cookie.domain=foo.bar
+authentication.cookie.path=/
+authentication.cookie.max-age=600
+```
+4. Add annotation with endpoints that should be protected and open:
 ```kotlin
 @Configuration
 @EnableProtectedRequests(
