@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 open class WebSecurityConfig(private val jwsServiceImpl: JwsService,
-                             private val cookieService: CookieService,
+                             private val cookieServiceImpl: CookieService,
                              private val authApiClientImpl: AuthApiClient) : WebSecurityConfigurerAdapter() {
 
     private val annotation: EnableProtectedRequests
@@ -40,7 +40,7 @@ open class WebSecurityConfig(private val jwsServiceImpl: JwsService,
                 .anyRequest().authenticated().and().httpBasic().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .csrf().disable()
-                .addFilterBefore(BearerAuthenticationFilter(jwsServiceImpl, cookieService, authApiClientImpl), UsernamePasswordAuthenticationFilter::class.java)
+                .addFilterBefore(BearerAuthenticationFilter(jwsServiceImpl, cookieServiceImpl, authApiClientImpl), UsernamePasswordAuthenticationFilter::class.java)
 
     }
 

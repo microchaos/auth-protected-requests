@@ -4,7 +4,8 @@ import dev.jarand.authprotectedrequests.WebSecurityConfig
 import dev.jarand.authprotectedrequests.authapi.AuthApiClientConfig
 import dev.jarand.authprotectedrequests.authapi.AuthApiClientImpl
 import dev.jarand.authprotectedrequests.authapi.AuthApiClientMock
-import dev.jarand.authprotectedrequests.cookie.CookieService
+import dev.jarand.authprotectedrequests.cookie.CookieServiceImpl
+import dev.jarand.authprotectedrequests.cookie.CookieServiceMock
 import dev.jarand.authprotectedrequests.jws.JwsServiceImpl
 import dev.jarand.authprotectedrequests.jws.JwsServiceMock
 import org.springframework.context.annotation.Import
@@ -15,7 +16,8 @@ import org.springframework.context.annotation.Import
     WebSecurityConfig::class,
     JwsServiceImpl::class,
     JwsServiceMock::class,
-    CookieService::class,
+    CookieServiceImpl::class,
+    CookieServiceMock::class,
     AuthApiClientImpl::class,
     AuthApiClientMock::class,
     AuthApiClientConfig::class
