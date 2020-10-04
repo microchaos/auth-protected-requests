@@ -37,6 +37,8 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
                 .collect(Collectors.toList())
         logger.debug("Found ${tokenCookies.size} token cookies.")
 
+        var securityContextSet = false
+
         for (tokenCookie in tokenCookies) {
             if (tokenCookie.name == "access_token") {
                 logger.debug("Processing access_token.")
@@ -44,6 +46,7 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
                 if (result.state == ParseClaimsResultState.SUCCESS && result.claims != null) {
                     logger.debug("Successfully parsed access_token. Setting security context.")
                     setSecurityContext(result.claims)
+                    securityContextSet = true
                 } else if (result.state != ParseClaimsResultState.EXPIRED) {
                     logger.debug("Parse failed with state ${result.state}. Returning 401.")
                     response.sendError(HttpStatus.UNAUTHORIZED.value())
@@ -51,22 +54,26 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
                 }
             } else if (tokenCookie.name == "refresh_token") {
                 logger.debug("Processing refresh_token.")
-                val accessToken = authApiClient.refreshToken(tokenCookie.value)
-                if (accessToken == null) {
-                    logger.debug("No access_token returned when trying to refresh token. Returning 401.")
-                    response.sendError(HttpStatus.UNAUTHORIZED.value())
-                    return
-                }
-                val result = jwsService.parseClaims(tokenCookie.value)
-                if (result.state == ParseClaimsResultState.SUCCESS && result.claims != null) {
-                    logger.debug("Successfully parsed access_token after refreshing. Adding new access token to cookie.")
-                    response.addCookie(createCookie(accessToken, tokenCookie))
-                    logger.debug("Successfully added access_token to cookie. Setting security context.")
-                    setSecurityContext(result.claims)
-                } else if (result.state != ParseClaimsResultState.EXPIRED) {
-                    logger.debug("Parse after refreshing failed with state ${result.state}. Returning 401.")
-                    response.sendError(HttpStatus.UNAUTHORIZED.value())
-                    return
+                if (!securityContextSet) {
+                    val accessToken = authApiClient.refreshToken(tokenCookie.value)
+                    if (accessToken == null) {
+                        logger.debug("No access_token returned when trying to refresh token. Returning 401.")
+                        response.sendError(HttpStatus.UNAUTHORIZED.value())
+                        return
+                    }
+                    val result = jwsService.parseClaims(tokenCookie.value)
+                    if (result.state == ParseClaimsResultState.SUCCESS && result.claims != null) {
+                        logger.debug("Successfully parsed access_token after refreshing. Adding new access token to cookie.")
+                        response.addCookie(createCookie(accessToken, tokenCookie))
+                        logger.debug("Successfully added access_token to cookie. Setting security context.")
+                        setSecurityContext(result.claims)
+                    } else if (result.state != ParseClaimsResultState.EXPIRED) {
+                        logger.debug("Parse after refreshing failed with state ${result.state}. Returning 401.")
+                        response.sendError(HttpStatus.UNAUTHORIZED.value())
+                        return
+                    }
+                } else {
+                    logger.debug("Security context has been set. Skipping refresh_token processing.")
                 }
             }
         }
@@ -84,11 +91,11 @@ class BearerAuthenticationFilter(private val jwsService: JwsService, private val
 
     private fun createCookie(accessToken: String, refreshTokenCookie: Cookie): Cookie {
         val cookie = Cookie("access_token", accessToken)
-        cookie.isHttpOnly = refreshTokenCookie.isHttpOnly
-        cookie.secure = refreshTokenCookie.secure
-        cookie.domain = refreshTokenCookie.domain
-        cookie.path = refreshTokenCookie.path
-        cookie.maxAge = 3600
+        cookie.isHttpOnly = true
+        cookie.secure = true
+        cookie.domain = "arkivet.app"
+        cookie.path = "/"
+        cookie.maxAge = 120
         return cookie
     }
 
