@@ -11,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import java.util.*
-import java.util.stream.Collectors
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
@@ -33,9 +32,9 @@ class BearerAuthenticationFilter(private val jwsService: JwsService,
             return
         }
 
-        val tokenCookies = Arrays.stream(request.cookies)
-                .filter { it.name == "access_token" || it.name == "refresh_token" }
-                .collect(Collectors.toList())
+        val accessTokenCookie = Arrays.stream(request.cookies).filter { it.name == "access_token" }.findFirst().orElse(null)
+        val refreshTokenCookie = Arrays.stream(request.cookies).filter { it.name == "refresh_token" }.findFirst().orElse(null)
+        val tokenCookies = listOfNotNull(accessTokenCookie, refreshTokenCookie)
         logger.debug("Found ${tokenCookies.size} token cookies.")
 
         var securityContextSet = false
