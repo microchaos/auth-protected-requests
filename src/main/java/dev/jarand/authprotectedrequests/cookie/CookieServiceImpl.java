@@ -8,7 +8,7 @@ import javax.servlet.http.Cookie;
 
 @Service
 @ConditionalOnProperty(name = "authentication.mock.enabled", havingValue = "false", matchIfMissing = true)
-class CookieServiceImpl implements CookieService {
+public class CookieServiceImpl implements CookieService {
 
     private final String name;
     private final boolean httpOnly;

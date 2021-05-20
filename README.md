@@ -12,7 +12,7 @@ Library for protecting applications and authorize users authenticated with Jaran
 </dependency>
 ```
 Maven Central: [Link](https://search.maven.org/artifact/dev.jarand/auth-protected-requests)
-GitHub Releases: [Link](https://github.com/microchaos/auth-protected-requests/releases)
+GitHub Releases: [Link](https://github.com/JarandDev/auth-protected-requests/releases)
 
 2. Configure URLs to the authentication api:
 ```
@@ -29,11 +29,11 @@ The key needs to be exposed in a JSON object like the following:
 3. Configure the access token cookie
 ```
 authentication.cookie.name=access_token
-authentication.cookie.http-only=true
+authentication.cookie.httpOnly=true
 authentication.cookie.secure=true
 authentication.cookie.domain=foo.bar
 authentication.cookie.path=/
-authentication.cookie.max-age=600
+authentication.cookie.maxAge=600
 ```
 4. Add annotation with endpoints that should be protected and open:
 ```kotlin
