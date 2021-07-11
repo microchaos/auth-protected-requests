@@ -15,5 +15,5 @@ public @interface ProtectRequest {
 
     String[] mvcPatterns();
 
-    String role();
+    String access();
 }

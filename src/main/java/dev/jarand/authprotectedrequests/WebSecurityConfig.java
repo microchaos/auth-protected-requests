@@ -1,9 +1,6 @@
 package dev.jarand.authprotectedrequests;
 
 import dev.jarand.authprotectedrequests.annotation.EnableProtectedRequests;
-import dev.jarand.authprotectedrequests.authapi.AuthApiClient;
-import dev.jarand.authprotectedrequests.cookie.CookieService;
-import dev.jarand.authprotectedrequests.jws.JwsService;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
@@ -12,24 +9,21 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 
 import java.util.Arrays;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final JwsService jwsServiceImpl;
-    private final CookieService cookieServiceImpl;
-    private final AuthApiClient authApiClientImpl;
+    private final TokenService tokenService;
     private final EnableProtectedRequests annotation;
 
-    public WebSecurityConfig(JwsService jwsServiceImpl, CookieService cookieServiceImpl, AuthApiClient authApiClientImpl) throws ClassNotFoundException {
-        this.jwsServiceImpl = jwsServiceImpl;
-        this.cookieServiceImpl = cookieServiceImpl;
-        this.authApiClientImpl = authApiClientImpl;
+    public WebSecurityConfig(TokenService tokenService) throws ClassNotFoundException {
+        this.tokenService = tokenService;
 
         final var provider = new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new AnnotationTypeFilter(EnableProtectedRequests.class));
@@ -46,13 +40,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         Arrays.asList(annotation.protectedRequests())
                 .forEach(protectedRequest -> interceptUrlRegistry
                         .mvcMatchers(protectedRequest.method(), protectedRequest.mvcPatterns())
-                        .hasRole(protectedRequest.role()));
+                        .access(protectedRequest.access()));
 
         http.authorizeRequests()
-                .anyRequest().authenticated().and().httpBasic().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .anyRequest().authenticated().and()
+                .sessionManagement().sessionCreationPolicy(STATELESS).and()
                 .csrf().disable()
-                .addFilterBefore(new BearerAuthenticationFilter(jwsServiceImpl, cookieServiceImpl, authApiClientImpl), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new BearerAuthenticationFilter(tokenService), RequestCacheAwareFilter.class);
 
     }
 
